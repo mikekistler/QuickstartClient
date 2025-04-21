@@ -1,5 +1,7 @@
 # QuickstartClient
 
+<!-- markdownlint-disable MD033 -->
+
 MCP Client Quickstart with MCP C# SDK
 
 ## System Requirements
@@ -149,7 +151,7 @@ using Anthropic.SDK;
 using Microsoft.Extensions.AI;
 ```
 
-This code also needs a utility function to prompt for input, `PropmtForInput`. Put this at the end of the Program.cs file:
+This code also needs a utility function to prompt for input, `PromptForInput`. Put this at the end of the Program.cs file:
 
 ```csharp
 static void PromptForInput()
@@ -208,5 +210,4 @@ The client will:
 
 Here's an example of what it should look like it connected to a weather server quickstart:
 
-<img src="/images/quickstart-dotnet-client.png" />
-
+![Screenshot of the QuickstartClient connected to a weather server](/images/quickstart-dotnet-client.png)
