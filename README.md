@@ -182,3 +182,31 @@ static void PromptForInput()
 - The server processes the query and returns a response.
 - The response is displayed to the user.
 
+## Running the Client
+
+To run your client with any MCP server:
+
+```bash
+dotnet run -- path/to/server.csproj # dotnet server
+dotnet run -- path/to/server.py # python server
+dotnet run -- path/to/server.js # node server
+```
+
+<Note>
+If you're continuing the weather tutorial from the server quickstart, your command might look something like this: `dotnet run -- path/to/QuickstartWeatherServer`.
+</Note>
+
+The client will:
+
+1. Connect to the specified server
+2. List available tools
+3. Start an interactive chat session where you can:
+   - Enter queries
+   - See tool executions
+   - Get responses from Claude
+4. Exit the session when done
+
+Here's an example of what it should look like it connected to a weather server quickstart:
+
+<img src="/images/quickstart-dotnet-client.png" />
+
