@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Anthropic.SDK;
+using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol.Transport;
@@ -26,6 +28,41 @@ foreach (var tool in tools)
     Console.WriteLine($"Connected to server with tools: {tool.Name}");
 }
 
+using var anthropicClient = new AnthropicClient(new APIAuthentication(builder.Configuration["ANTHROPIC_API_KEY"]))
+    .Messages
+    .AsBuilder()
+    .UseFunctionInvocation()
+    .Build();
+
+var options = new ChatOptions
+{
+    MaxOutputTokens = 1000,
+    ModelId = "claude-3-5-sonnet-20241022",
+    Tools = [.. tools]
+};
+
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine("MCP Client Started!");
+Console.ResetColor();
+
+PromptForInput();
+while(Console.ReadLine() is string query && !"exit".Equals(query, StringComparison.OrdinalIgnoreCase))
+{
+    if (string.IsNullOrWhiteSpace(query))
+    {
+        PromptForInput();
+        continue;
+    }
+
+    await foreach (var message in anthropicClient.GetStreamingResponseAsync(query, options))
+    {
+        Console.Write(message);
+    }
+    Console.WriteLine();
+
+    PromptForInput();
+}
+
 static (string command, string[] arguments) GetCommandAndArguments(string[] args)
 {
     return args switch
@@ -35,4 +72,12 @@ static (string command, string[] arguments) GetCommandAndArguments(string[] args
         [var script] when Directory.Exists(script) || (File.Exists(script) && script.EndsWith(".csproj")) => ("dotnet", ["run", "--project", script, "--no-build"]),
         _ => throw new NotSupportedException("An unsupported server script was provided. Supported scripts are .py, .js, or .csproj")
     };
+}
+
+static void PromptForInput()
+{
+    Console.WriteLine("Enter a command (or 'exit' to quit):");
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("> ");
+    Console.ResetColor();
 }

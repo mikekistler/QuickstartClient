@@ -101,3 +101,64 @@ static (string command, string[] arguments) GetCommandAndArguments(string[] args
 
 This configures a MCP client that will connect to a server that is provided as a command line argument. It then lists the available tools from the connected server.
 
+### Query processing logic
+
+Now let's add the core functionality for processing queries and handling tool calls:
+
+```csharp
+using var anthropicClient = new AnthropicClient(new APIAuthentication(builder.Configuration["ANTHROPIC_API_KEY"]))
+    .Messages
+    .AsBuilder()
+    .UseFunctionInvocation()
+    .Build();
+
+var options = new ChatOptions
+{
+    MaxOutputTokens = 1000,
+    ModelId = "claude-3-5-sonnet-20241022",
+    Tools = [.. tools]
+};
+
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine("MCP Client Started!");
+Console.ResetColor();
+
+PromptForInput();
+while(Console.ReadLine() is string query && !"exit".Equals(query, StringComparison.OrdinalIgnoreCase))
+{
+    if (string.IsNullOrWhiteSpace(query))
+    {
+        PromptForInput();
+        continue;
+    }
+
+    await foreach (var message in anthropicClient.GetStreamingResponseAsync(query, options))
+    {
+        Console.Write(message);
+    }
+    Console.WriteLine();
+
+    PromptForInput();
+}
+```
+
+This requires the following `using` statements:
+
+```csharp
+using Anthropic.SDK;
+using Microsoft.Extensions.AI;
+```
+
+This code also needs a utility function to prompt for input, `PropmtForInput`. Put this at the end of the Program.cs file:
+
+```csharp
+static void PromptForInput()
+{
+    Console.WriteLine("Enter a command (or 'exit' to quit):");
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("> ");
+    Console.ResetColor();
+}
+```
+
+
