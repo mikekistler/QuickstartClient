@@ -26,3 +26,12 @@ dotnet add package ModelContextProtocol --prerelease
 dotnet add package Anthropic.SDK
 dotnet add package Microsoft.Extensions.Hosting
 ```
+
+## Setting up your API key
+
+You'll need an Anthropic API key from the [Anthropic Console](https://console.anthropic.com/settings/keys).
+
+```bash
+dotnet user-secrets init
+dotnet user-secrets set "ANTHROPIC_API_KEY" "<your key here>"
+```
