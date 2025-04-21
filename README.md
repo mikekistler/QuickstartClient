@@ -55,3 +55,49 @@ builder.Configuration
 
 This creates the beginnings of a .NET console application that can read the API key from user secrets.
 
+Next, we'll setup the MCP Client:
+
+```csharp
+ar (command, arguments) = GetCommandAndArguments(args);
+
+var clientTransport = new StdioClientTransport(new()
+{
+    Name = "Demo Server",
+    Command = command,
+    Arguments = arguments,
+});
+
+await using var mcpClient = await McpClientFactory.CreateAsync(clientTransport);
+
+var tools = await mcpClient.ListToolsAsync();
+foreach (var tool in tools)
+{
+    Console.WriteLine($"Connected to server with tools: {tool.Name}");
+}
+```
+
+<Note>
+Be sure to add the `using` statements for the namespaces:
+```csharp
+using ModelContextProtocol.Client;
+using ModelContextProtocol.Protocol.Transport;
+```
+</Note>
+
+Add this function at the end of the Program.cs file:
+
+```csharp
+static (string command, string[] arguments) GetCommandAndArguments(string[] args)
+{
+    return args switch
+    {
+        [var script] when script.EndsWith(".py") => ("python", args),
+        [var script] when script.EndsWith(".js") => ("node", args),
+        [var script] when Directory.Exists(script) || (File.Exists(script) && script.EndsWith(".csproj")) => ("dotnet", ["run", "--project", script, "--no-build"]),
+        _ => throw new NotSupportedException("An unsupported server script was provided. Supported scripts are .py, .js, or .csproj")
+    };
+}
+```
+
+This configures a MCP client that will connect to a server that is provided as a command line argument. It then lists the available tools from the connected server.
+
