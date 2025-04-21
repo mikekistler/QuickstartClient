@@ -161,4 +161,24 @@ static void PromptForInput()
 }
 ```
 
+## Key Components Explained
+
+### 1. Client Initialization
+
+- The client is initialized using `McpClientFactory.CreateAsync()`, which sets up the transport type and command to run the server.
+
+### 2. Server Connection
+
+- Supports Python, Node.js, and .NET servers.
+- The server is started using the command specified in the arguments.
+- Configures to use stdio for communication with the server.
+- Initializes the session and available tools.
+
+### 3. Query Processing
+
+- Leverages [Microsoft.Extensions.AI](https://learn.microsoft.com/dotnet/ai/ai-extensions) for the chat client.
+- Configures the `IChatClient` to use automatic tool (function) invocation.
+- The client reads user input and sends it to the server.
+- The server processes the query and returns a response.
+- The response is displayed to the user.
 
