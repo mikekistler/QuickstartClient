@@ -18,3 +18,11 @@ First, create a new .NET project:
 dotnet new console -n QuickstartClient
 cd QuickstartClient
 ```
+
+Then, add the required dependencies to your project:
+
+```bash
+dotnet add package ModelContextProtocol --prerelease
+dotnet add package Anthropic.SDK
+dotnet add package Microsoft.Extensions.Hosting
+```
