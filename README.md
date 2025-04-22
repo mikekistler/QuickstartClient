@@ -1,11 +1,8 @@
 # QuickstartClient
 
-<!-- markdownlint-disable MD033 -->
-
 MCP Client Quickstart with MCP C# SDK
 
 ## System Requirements
-
 Before starting, ensure your system meets these requirements:
 
 - .NET 8.0 or higher
@@ -30,7 +27,6 @@ dotnet add package Microsoft.Extensions.Hosting
 ```
 
 ## Setting up your API key
-
 You'll need an Anthropic API key from the [Anthropic Console](https://console.anthropic.com/settings/keys).
 
 ```bash
@@ -41,12 +37,15 @@ dotnet user-secrets set "ANTHROPIC_API_KEY" "<your key here>"
 ## Creating the Client
 
 ### Basic Client Structure
-
 First, let's setup the basic client class:
 
 ```csharp
+using Anthropic.SDK;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using ModelContextProtocol.Client;
+using ModelContextProtocol.Protocol.Transport;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -60,7 +59,7 @@ This creates the beginnings of a .NET console application that can read the API 
 Next, we'll setup the MCP Client:
 
 ```csharp
-ar (command, arguments) = GetCommandAndArguments(args);
+var (command, arguments) = GetCommandAndArguments(args);
 
 var clientTransport = new StdioClientTransport(new()
 {
@@ -78,14 +77,6 @@ foreach (var tool in tools)
 }
 ```
 
-<Note>
-Be sure to add the `using` statements for the namespaces:
-```csharp
-using ModelContextProtocol.Client;
-using ModelContextProtocol.Protocol.Transport;
-```
-</Note>
-
 Add this function at the end of the Program.cs file:
 
 ```csharp
@@ -101,10 +92,9 @@ static (string command, string[] arguments) GetCommandAndArguments(string[] args
 }
 ```
 
-This configures a MCP client that will connect to a server that is provided as a command line argument. It then lists the available tools from the connected server.
+This creates and configures a MCP client that will connect to a server that is provided as a command line argument. It then lists the available tools from the connected server.
 
 ### Query processing logic
-
 Now let's add the core functionality for processing queries and handling tool calls:
 
 ```csharp
@@ -142,18 +132,7 @@ while(Console.ReadLine() is string query && !"exit".Equals(query, StringComparis
 
     PromptForInput();
 }
-```
 
-This requires the following `using` statements:
-
-```csharp
-using Anthropic.SDK;
-using Microsoft.Extensions.AI;
-```
-
-This code also needs a utility function to prompt for input, `PromptForInput`. Put this at the end of the Program.cs file:
-
-```csharp
 static void PromptForInput()
 {
     Console.WriteLine("Enter a command (or 'exit' to quit):");
@@ -166,18 +145,15 @@ static void PromptForInput()
 ## Key Components Explained
 
 ### 1. Client Initialization
-
 - The client is initialized using `McpClientFactory.CreateAsync()`, which sets up the transport type and command to run the server.
 
 ### 2. Server Connection
-
 - Supports Python, Node.js, and .NET servers.
 - The server is started using the command specified in the arguments.
 - Configures to use stdio for communication with the server.
 - Initializes the session and available tools.
 
 ### 3. Query Processing
-
 - Leverages [Microsoft.Extensions.AI](https://learn.microsoft.com/dotnet/ai/ai-extensions) for the chat client.
 - Configures the `IChatClient` to use automatic tool (function) invocation.
 - The client reads user input and sends it to the server.
@@ -185,9 +161,7 @@ static void PromptForInput()
 - The response is displayed to the user.
 
 ## Running the Client
-
 To run your client with any MCP server:
-
 ```bash
 dotnet run -- path/to/server.csproj # dotnet server
 dotnet run -- path/to/server.py # python server
